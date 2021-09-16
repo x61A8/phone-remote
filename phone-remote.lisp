@@ -15,4 +15,25 @@
 (defun get-vk (char)
   (gethash char *vks*))
 
+(defun send-keydown (virtual-keycode)
+  (cffi:with-foreign-object (inputs 'win32:input 1)
+    (cffi:with-foreign-slots ((win32:type win32:input) (cffi:mem-aref inputs 'win32:input 0)  win32:input)
+      (cffi:with-foreign-slots ((mi win32:ki hi) win32:input win32:input_input-union)
+	(cffi:with-foreign-slots ((win32:vk scan flags time extra-info) win32:ki  win32:keybdinput)
+	  (setf win32:type 1
+		win32:vk virtual-keycode))))
+    (win32:send-input 1 inputs (cffi:foreign-type-size 'win32:input))))
+
+(defun send-keyup (virtual-keycode)
+  (cffi:with-foreign-object (inputs 'win32:input 1)
+    (cffi:with-foreign-slots ((win32:type win32:input) (cffi:mem-aref inputs 'win32:input 0) win32:input)
+      (cffi:with-foreign-slots ((mi win32:ki hi) win32:input win32:input_input-union)
+	(cffi:with-foreign-slots ((win32:vk scan win32:flags time extra-info) win32:ki win32:keybdinput)
+	  (setf win32:type 1
+		win32:vk virtual-keycode
+		win32:flags 2))))
+    (win32:send-input 1 inputs (cffi:foreign-type-size 'win32:input))))
+
+
+
 
