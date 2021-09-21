@@ -34,6 +34,12 @@
 		win32:flags 2))))
     (win32:send-input 1 inputs (cffi:foreign-type-size 'win32:input))))
 
+;;; Config
+(defun read-config (filespec)
+  (with-open-file (f filespec)
+    (let ((address (read-line f))
+	  (port (parse-integer (read-line f))))
+      (values address port))))
 
 
 
