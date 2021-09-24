@@ -3,6 +3,7 @@ div {
     flex: 3;
     align-items: stretch;
     justify-content: center;
+    user-select: none;
 }
 
 html, body, #all { height: 100%; }
