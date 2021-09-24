@@ -46,5 +46,9 @@
 				    :document-root "./webpage/"
 				    :port 0)))
 
+;;; QR code
+(defun create-qr-code (address port)
+  (cl-qrencode:encode-png (format nil "~A:~A" address port)))
+
 ;;; Main
 
