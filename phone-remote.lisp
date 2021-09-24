@@ -36,10 +36,9 @@
 
 ;;; Config
 (defun read-config (filespec)
+  "Read the first line in filespec as the host address."
   (with-open-file (f filespec)
-    (let ((address (read-line f))
-	  (port (parse-integer (read-line f))))
-      (values address port))))
+    (read-line f)))
 
 
 
