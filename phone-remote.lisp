@@ -40,5 +40,11 @@
   (with-open-file (f filespec)
     (read-line f)))
 
+;;; Webserver
+(defun start-server ()
+  (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor
+				    :document-root "./webpage/"
+				    :port 0)))
 
+;;; Main
 
