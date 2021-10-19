@@ -47,8 +47,8 @@
 				    :port 0)))
 
 ;;; QR code
-(defun create-qr-code (address port)
-  (cl-qrencode:encode-png (format nil "~A:~A" address port)))
+(defun create-qr-code (address webpage-port ws-port)
+  (cl-qrencode:encode-png (format nil "http://~A:~A/?ws=~A" address webpage-port ws-port)))
 
 ;;; Websockets
 (defclass ws-client (hunchensocket:websocket-client) ())
