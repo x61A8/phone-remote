@@ -47,8 +47,11 @@
 				    :port 0)))
 
 ;;; QR code
-(defun create-qr-code (address webpage-port ws-port)
-  (cl-qrencode:encode-png (format nil "http://~A:~A/?ws=~A" address webpage-port ws-port)))
+(defun create-target-url (address webpage-port ws-port)
+  (format nil "http://~A:~A/?ws=~A" address webpage-port ws-port))
+
+(defun create-qr-code (url)
+  (cl-qrencode:encode-png url))
 
 ;;; Websockets
 (defclass ws-client (hunchensocket:websocket-client) ())
@@ -79,8 +82,10 @@
 
 ;;; Main
 (defun main ()
-  (let ((web-server (start-server))
-	(ws-server (start-ws-server)))
-    (create-qr-code (read-host-address "address.txt")
-		    (hunchentoot:acceptor-port web-server)
-		    (hunchentoot:acceptor-port ws-server))))
+  (let* ((web-server (start-server))
+	 (ws-server (start-ws-server))
+	 (target-url (create-target-url (read-host-address "address.txt")
+					(hunchentoot:acceptor-port web-server)
+					(hunchentoot:acceptor-port ws-server))))
+    (create-qr-code target-url)
+    target-url))
