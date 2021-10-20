@@ -35,7 +35,7 @@
     (win32:send-input 1 inputs (cffi:foreign-type-size 'win32:input))))
 
 ;;; Config
-(defun read-config (filespec)
+(defun read-host-address (filespec)
   "Read the first line in filespec as the host address."
   (with-open-file (f filespec)
     (read-line f)))
