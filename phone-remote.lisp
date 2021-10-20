@@ -53,28 +53,28 @@
 ;;; Websockets
 (defclass ws-client (hunchensocket:websocket-client) ())
 (defclass ws-server (hunchensocket:websocket-resource)
-  ((player :initarg :player :initform (error "Assign me a player number!") :reader player))
+  ((path :initarg :path :initform (error "Assign me a path!") :reader path))
   (:default-initargs :client-class 'ws-client))
 
 (defmethod hunchensocket:client-connected ((server ws-server) client)
-  (format t "~&Client connected to server ~A." (player server))
+  (format t "~&Client connected to websocket server.")
   (force-output))
 (defmethod hunchensocket:client-disconnected ((server ws-server) client)
-  (format t "~&Client disconnected from server ~A." (player server))
+  (format t "~&Client disconnected from websocket server.")
   (force-output))
 (defmethod hunchensocket:text-message-received ((server ws-server) client message)
-  (format t "~&Server ~A recieved: | ~A |" (player server) message)
+  (format t "~&Websocket server recieved: | ~A |" message)
   (force-output))  
 
 
-(defparameter *ws-servers* (list (make-instance 'ws-server :player "/1")
-				 (make-instance 'ws-server :player "/2")))
+(defparameter *ws-server* (make-instance 'ws-server :path "/"))
 
-(defun find-room (request)
-  (find (hunchentoot:script-name request) *ws-servers* :test #'string= :key #'player))
+(defun find-ws-server (request)
+  (when (string= (hunchentoot:script-name request) (path *ws-server*))
+    *ws-server*))
 
 (defun start-ws-server ()
-  (pushnew 'find-room hunchensocket:*websocket-dispatch-table*)
+  (pushnew 'find-ws-server hunchensocket:*websocket-dispatch-table*)
   (hunchentoot:start (make-instance 'hunchensocket:websocket-acceptor :port 0)))
 
 ;;; Main
