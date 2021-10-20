@@ -78,4 +78,9 @@
   (hunchentoot:start (make-instance 'hunchensocket:websocket-acceptor :port 0)))
 
 ;;; Main
-
+(defun main ()
+  (let ((web-server (start-server))
+	(ws-server (start-ws-server)))
+    (create-qr-code (read-host-address "address.txt")
+		    (hunchentoot:acceptor-port web-server)
+		    (hunchentoot:acceptor-port ws-server))))
