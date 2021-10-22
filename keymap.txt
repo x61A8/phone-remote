@@ -1,0 +1,20 @@
+P1
+L A
+U W
+D S
+R D
+* E
+E Q
+B N
+A M
+
+P2
+L J
+U I
+D K
+R L
+* O
+E U
+B Z
+A X
+
