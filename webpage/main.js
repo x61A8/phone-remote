@@ -1,3 +1,4 @@
+// WebSockets
 function getWS () {
     const url = new URL(window.location.href);
     const address = url.hostname;
