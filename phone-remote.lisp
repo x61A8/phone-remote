@@ -53,6 +53,48 @@
 (defun create-qr-code (url)
   (cl-qrencode:encode-png url))
 
+;;; Keymap interpreter
+(defun strip-spaces (string)
+  (flet ((spacep (char) (char= char #\Space)))
+    (let ((start (position-if (complement #'spacep) string)))
+      (if start
+	  (let ((end (position-if (complement #'spacep) string :from-end t)))
+	    (subseq string start (1+ end)))
+	  ""))))
+
+(defun key-line-p (line)
+  (and (= (length line) 3)
+       (char= (char line 1) #\Space)
+       (alphanumericp (char line 2))))
+
+(defun player-line-p (line)
+  (and (>= (length line) 2)
+       (char= (char line 0) #\P)
+       (every #'digit-char-p (subseq line 1))))
+
+(defun blankp (line)
+  (= (length line) 0))
+
+(defun read-keymaps (stream)
+  (let ((keymaps (make-array 0 :adjustable t :initial-element nil))
+	(player nil))
+    (flet ((process-line (line)
+	     (cond ((key-line-p line) (when player
+					(setf (gethash (char line 0) (aref keymaps player))
+					      (get-vk (char line 2)))))
+		   ((blankp line) nil)
+		   ((player-line-p line)
+		    (setf player (parse-integer line :start 1))
+		    (when (< (length keymaps) (+ player 1))
+		      (setf keymaps (adjust-array keymaps (+ player 1) :initial-element nil)))
+		    (unless (aref keymaps player)
+		      (setf (aref keymaps player) (make-hash-table))))
+		   (t (format t "~&Discarding invalid line: ~A~%" line)))))
+      (loop as line = (read-line stream nil nil)
+	    while line
+	    do (process-line (string-upcase (strip-spaces line))))
+      keymaps)))
+
 ;;; Websockets
 (defclass ws-client (hunchensocket:websocket-client) ())
 (defclass ws-server (hunchensocket:websocket-resource)
