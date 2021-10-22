@@ -42,6 +42,7 @@
 
 ;;; Webserver
 (defun start-server ()
+  (format t "~&Starting web server...")
   (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor
 				    :document-root "./webpage/"
 				    :port 0)))
@@ -51,6 +52,7 @@
   (format nil "http://~A:~A/?ws=~A" address webpage-port ws-port))
 
 (defun create-qr-code (url)
+  (format t "~&Creating QR code...")
   (cl-qrencode:encode-png url))
 
 ;;; Keymap interpreter
@@ -127,17 +129,21 @@
     *ws-server*))
 
 (defun start-ws-server ()
+  (format t "~&Starting WebSocket server...")
   (pushnew 'find-ws-server hunchensocket:*websocket-dispatch-table*)
   (hunchentoot:start (make-instance 'hunchensocket:websocket-acceptor :port 0)))
 
 ;;; Main
 (defun main ()
-  (with-open-file (f "./keymaps.txt")
+  (format t "~&Reading keymaps...~%")
+  (with-open-file (f "keymaps.txt")
     (setf *keymaps* (read-keymaps f)))
+  (format t "~&Reading keymaps complete.~%")
   (let* ((web-server (start-server))
 	 (ws-server (start-ws-server))
 	 (target-url (create-target-url (read-host-address "address.txt")
 					(hunchentoot:acceptor-port web-server)
 					(hunchentoot:acceptor-port ws-server))))
-    (create-qr-code target-url)
+    (format t "~&Created QR code @ ~A" (create-qr-code target-url))
+    (format t "~&Ready @ ~A" target-url)
     target-url))
