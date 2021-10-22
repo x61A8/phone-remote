@@ -5,4 +5,5 @@
   (:import-from #:hunchentoot)
   (:import-from #:hunchensocket)
   (:import-from #:cl-qrencode)
+  (:export main)
   )
