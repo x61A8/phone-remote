@@ -20,7 +20,7 @@ function switchPlayer () {
     }
     playerButton.textContent = `Player ${player}`;
 }
-playerButton.addEventListener('click', event => {
+playerButton.addEventListener('click', e => {
     switchPlayer();
 });
 
