@@ -25,22 +25,20 @@ playerButton.addEventListener('click', e => {
 });
 
 // Input Handling
-function sendKeyDown (key) {
-    const message = 'D' + key + player;
-    socket.send(message);
-}
-function sendKeyUp (key) {
-    const message = 'U' + key + player;
+function sendKey (key) {
+    const message = key + player;
     socket.send(message);
 }
 
+const intervals = new Map();
 function addButtonListeners (id, key) {
     const button = document.getElementById(id);
     button.addEventListener('pointerdown', e => {
-	sendKeyDown(key);
+	sendKey(key);
+	intervals.set(key, setInterval(function(){sendKey(key);}, 50));
     });
     button.addEventListener('pointerup', e => {
-	sendKeyUp(key);
+	clearInterval(intervals.get(key));
     });
 }
 

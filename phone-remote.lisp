@@ -100,12 +100,10 @@
 ;;; Websocket message handler
 (defvar *keymaps* nil)
 (defun handle-message (message)
-  (funcall (if (char= (char message 0) #\D)
-	       #'send-keydown
-	       #'send-keyup)
-	   (gethash (char message 1)
+  (funcall #'send-keydown
+	   (gethash (char message 0)
 		    (aref *keymaps*
-			  (parse-integer message :start 2)))))
+			  (parse-integer message :start 1)))))
 
 ;;; Websockets
 (defclass ws-client (hunchensocket:websocket-client) ())
