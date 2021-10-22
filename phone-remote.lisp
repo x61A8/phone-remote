@@ -95,6 +95,16 @@
 	    do (process-line (string-upcase (strip-spaces line))))
       keymaps)))
 
+;;; Websocket message handler
+(defvar *keymaps* nil)
+(defun handle-message (message)
+  (funcall (if (char= (char message 0) #\D)
+	       #'send-keydown
+	       #'send-keyup)
+	   (gethash (char message 1)
+		    (aref *keymaps*
+			  (parse-integer message :start 2)))))
+
 ;;; Websockets
 (defclass ws-client (hunchensocket:websocket-client) ())
 (defclass ws-server (hunchensocket:websocket-resource)
@@ -108,9 +118,7 @@
   (format t "~&Client disconnected from websocket server.")
   (force-output))
 (defmethod hunchensocket:text-message-received ((server ws-server) client message)
-  (format t "~&Websocket server recieved: | ~A |" message)
-  (force-output))  
-
+  (handle-message message))  
 
 (defparameter *ws-server* (make-instance 'ws-server :path "/"))
 
@@ -124,6 +132,8 @@
 
 ;;; Main
 (defun main ()
+  (with-open-file (f "./keymaps.txt")
+    (setf *keymaps* (read-keymaps f)))
   (let* ((web-server (start-server))
 	 (ws-server (start-ws-server))
 	 (target-url (create-target-url (read-host-address "address.txt")
