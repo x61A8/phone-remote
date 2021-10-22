@@ -24,3 +24,31 @@ playerButton.addEventListener('click', e => {
     switchPlayer();
 });
 
+// Input Handling
+function sendKeyDown (key) {
+    const message = 'D' + key + player;
+    socket.send(message);
+}
+function sendKeyUp (key) {
+    const message = 'U' + key + player;
+    socket.send(message);
+}
+
+function addButtonListeners (id, key) {
+    const button = document.getElementById(id);
+    button.addEventListener('pointerdown', e => {
+	sendKeyDown(key);
+    });
+    button.addEventListener('pointerup', e => {
+	sendKeyUp(key);
+    });
+}
+
+addButtonListeners('left', 'L');
+addButtonListeners('up', 'U');
+addButtonListeners('down', 'D');
+addButtonListeners('right', 'R');
+addButtonListeners('start', '*');
+addButtonListeners('select', 'E');
+addButtonListeners('b', 'B');
+addButtonListeners('a', 'A');
