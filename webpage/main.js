@@ -30,15 +30,24 @@ function sendKey (key) {
     socket.send(message);
 }
 
-const intervals = new Map();
+const timeouts = new Map();
+const mouseTracker = new Map();
+
 function addButtonListeners (id, key) {
     const button = document.getElementById(id);
     button.addEventListener('pointerdown', e => {
 	sendKey(key);
-	intervals.set(key, setInterval(function(){sendKey(key);}, 50));
+	timeouts.set(key, setTimeout(function repeat(){
+	    if (mouseTracker.get(key))
+	    {
+		sendKey(key);
+		setTimeout(repeat, 50);
+	    }}, 50));
+	mouseTracker.set(key, true);
     });
     button.addEventListener('pointerup', e => {
-	clearInterval(intervals.get(key));
+	clearTimeout(timeouts.get(key));
+	mouseTracker.set(key, false);
     });
 }
 
