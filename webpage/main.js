@@ -41,8 +41,8 @@ function addButtonListeners (id, key) {
 	    if (mouseTracker.get(key))
 	    {
 		sendKey(key);
-		setTimeout(repeat, 50);
-	    }}, 50));
+		setTimeout(repeat, 100);
+	    }}, 100));
 	mouseTracker.set(key, true);
     });
     button.addEventListener('pointerup', e => {
