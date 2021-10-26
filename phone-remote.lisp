@@ -1,37 +1,43 @@
 (in-package #:phone-remote)
 
 ;;; Keyboard Input
-(defun init-vks ()
-  (let ((ret (make-hash-table :size 36)))
-    (loop for char from (char-code #\0) to (char-code #\9)
-	  for vk from #x30 to #x39
-	  do (setf (gethash (code-char char) ret) vk))
-    (loop for char from (char-code #\A) to (char-code #\Z)
-	  for vk from #x41 to #x5A
-	  do (setf (gethash (code-char char) ret) vk))
+(defun init-scancodes ()
+  (let ((ret (make-hash-table))
+	(row1 "1234567890")
+	(start1 #x02)
+	(row2 "QWERTYUIOP")
+	(start2 #x10)
+	(row3 "ASDFGHJKL")
+	(start3 #x1E)
+	(row4 "ZXCVBNM")
+	(start4 #x2C))
+    (loop for char across row1
+	  for scancode from start1
+	  do (setf (gethash char ret) scancode))
+    (loop for char across row2
+	  for scancode from start2
+	  do (setf (gethash char ret) scancode))
+    (loop for char across row3
+	  for scancode from start3
+	  do (setf (gethash char ret) scancode))
+    (loop for char across row4
+	  for scancode from start4
+	  do (setf (gethash char ret) scancode))
     ret))
 
-(defparameter *vks* (init-vks))
-(defun get-vk (char)
-  (gethash char *vks*))
+(defparameter *scancodes* (init-scancodes))
+(defun get-scancode (char)
+  (gethash char *scancodes*))
 
-(defun send-keydown (virtual-keycode)
+(defun send-scancode-down (scancode)
   (cffi:with-foreign-object (inputs 'win32:input 1)
     (cffi:with-foreign-slots ((win32:type win32:input) (cffi:mem-aref inputs 'win32:input 0)  win32:input)
       (cffi:with-foreign-slots ((mi win32:ki hi) win32:input win32:input_input-union)
-	(cffi:with-foreign-slots ((win32:vk scan flags time extra-info) win32:ki  win32:keybdinput)
+	(cffi:with-foreign-slots ((win32:vk win32:scan win32:flags time extra-info) win32:ki  win32:keybdinput)
 	  (setf win32:type 1
-		win32:vk virtual-keycode))))
-    (win32:send-input 1 inputs (cffi:foreign-type-size 'win32:input))))
-
-(defun send-keyup (virtual-keycode)
-  (cffi:with-foreign-object (inputs 'win32:input 1)
-    (cffi:with-foreign-slots ((win32:type win32:input) (cffi:mem-aref inputs 'win32:input 0) win32:input)
-      (cffi:with-foreign-slots ((mi win32:ki hi) win32:input win32:input_input-union)
-	(cffi:with-foreign-slots ((win32:vk scan win32:flags time extra-info) win32:ki win32:keybdinput)
-	  (setf win32:type 1
-		win32:vk virtual-keycode
-		win32:flags 2))))
+		win32:vk 0
+		win32:scan scancode
+		win32:flags 8))))
     (win32:send-input 1 inputs (cffi:foreign-type-size 'win32:input))))
 
 ;;; Config
@@ -83,7 +89,7 @@
     (flet ((process-line (line)
 	     (cond ((key-line-p line) (when player
 					(setf (gethash (char line 0) (aref keymaps player))
-					      (get-vk (char line 2)))))
+					      (get-scancode (char line 2)))))
 		   ((blankp line) nil)
 		   ((player-line-p line)
 		    (setf player (parse-integer line :start 1))
@@ -100,7 +106,7 @@
 ;;; Websocket message handler
 (defvar *keymaps* nil)
 (defun handle-message (message)
-  (funcall #'send-keydown
+  (funcall #'send-scancode
 	   (gethash (char message 0)
 		    (aref *keymaps*
 			  (parse-integer message :start 1)))))
