@@ -54,6 +54,21 @@ function addButtonListeners (id, key) {
 	mouseTracker.set(key, false);
 	sendKeyUp(key);
     });
+    button.addEventListener('pointercancel', e => {
+	clearTimeout(timeouts.get(key));
+	mouseTracker.set(key, false);
+	sendKeyUp(key);
+    });
+    button.addEventListener('pointerout', e => {
+	clearTimeout(timeouts.get(key));
+	mouseTracker.set(key, false);
+	sendKeyUp(key);
+    });
+    button.addEventListener('pointerleave', e => {
+	clearTimeout(timeouts.get(key));
+	mouseTracker.set(key, false);
+	sendKeyUp(key);
+    });
 }
 
 addButtonListeners('left', 'L');
