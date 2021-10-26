@@ -40,6 +40,17 @@
 		win32:flags 8))))
     (win32:send-input 1 inputs (cffi:foreign-type-size 'win32:input))))
 
+(defun send-scancode-up (scancode)
+  (cffi:with-foreign-object (inputs 'win32:input 1)
+    (cffi:with-foreign-slots ((win32:type win32:input) (cffi:mem-aref inputs 'win32:input 0)  win32:input)
+      (cffi:with-foreign-slots ((mi win32:ki hi) win32:input win32:input_input-union)
+	(cffi:with-foreign-slots ((win32:vk win32:scan win32:flags time extra-info) win32:ki  win32:keybdinput)
+	  (setf win32:type 1
+		win32:vk 0
+		win32:scan scancode
+		win32:flags 10))))
+    (win32:send-input 1 inputs (cffi:foreign-type-size 'win32:input))))
+
 ;;; Config
 (defun read-host-address (filespec)
   "Read the first line in filespec as the host address."
@@ -106,10 +117,12 @@
 ;;; Websocket message handler
 (defvar *keymaps* nil)
 (defun handle-message (message)
-  (funcall #'send-scancode
-	   (gethash (char message 0)
+  (funcall (if (char= (char message 0) #\D)
+	       #'send-scancode-down
+	       #'send-scancode-up)
+	   (gethash (char message 1)
 		    (aref *keymaps*
-			  (parse-integer message :start 1)))))
+			  (parse-integer message :start 2)))))
 
 ;;; Websockets
 (defclass ws-client (hunchensocket:websocket-client) ())

@@ -25,8 +25,12 @@ playerButton.addEventListener('click', e => {
 });
 
 // Input Handling
-function sendKey (key) {
-    const message = key + player;
+function sendKeyDown (key) {
+    const message = 'D' + key + player;
+    socket.send(message);
+}
+function sendKeyUp (key) {
+    const message = 'U' + key + player;
     socket.send(message);
 }
 
@@ -36,11 +40,11 @@ const mouseTracker = new Map();
 function addButtonListeners (id, key) {
     const button = document.getElementById(id);
     button.addEventListener('pointerdown', e => {
-	sendKey(key);
+	sendKeyDown(key);
 	timeouts.set(key, setTimeout(function repeat(){
 	    if (mouseTracker.get(key))
 	    {
-		sendKey(key);
+		sendKeyDown(key);
 		setTimeout(repeat, 100);
 	    }}, 100));
 	mouseTracker.set(key, true);
@@ -48,6 +52,7 @@ function addButtonListeners (id, key) {
     button.addEventListener('pointerup', e => {
 	clearTimeout(timeouts.get(key));
 	mouseTracker.set(key, false);
+	sendKeyUp(key);
     });
 }
 
