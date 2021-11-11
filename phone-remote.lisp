@@ -163,7 +163,7 @@
 					(hunchentoot:acceptor-port web-server)
 					(hunchentoot:acceptor-port ws-server))))
     (format t "~&Created QR code @ ~A" (create-qr-code target-url))
-    (format t "~&Ready @ ~A" target-url)
+    (format t "~&Ready @ ~A~%" target-url)
     (finish-output)
     (loop
       (sleep most-positive-fixnum))))
