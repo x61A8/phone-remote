@@ -3,27 +3,14 @@
 ;;; Keyboard Input
 (defun init-scancodes ()
   (let ((ret (make-hash-table))
-	(row1 "1234567890")
-	(start1 #x02)
-	(row2 "QWERTYUIOP")
-	(start2 #x10)
-	(row3 "ASDFGHJKL")
-	(start3 #x1E)
-	(row4 "ZXCVBNM")
-	(start4 #x2C))
-    (loop for char across row1
-	  for scancode from start1
-	  do (setf (gethash char ret) scancode))
-    (loop for char across row2
-	  for scancode from start2
-	  do (setf (gethash char ret) scancode))
-    (loop for char across row3
-	  for scancode from start3
-	  do (setf (gethash char ret) scancode))
-    (loop for char across row4
-	  for scancode from start4
-	  do (setf (gethash char ret) scancode))
-    ret))
+	(scancode-assoc '((#x02 . "1234567890-=")
+			  (#x10 . "QWERTYUIOP[]")
+			  (#x1E . "ASDFGHJKL;'`")
+			  (#x2C . "ZXCVBNM,./"))))
+    (dolist (pair scancode-assoc ret)
+      (loop for char across (cdr pair)
+	    for scancode from (car pair)
+	    do (setf (gethash char ret) scancode)))))
 
 (defparameter *scancodes* (init-scancodes))
 (defun get-scancode (char)
@@ -83,8 +70,7 @@
 
 (defun key-line-p (line)
   (and (= (length line) 3)
-       (char= (char line 1) #\Space)
-       (alphanumericp (char line 2))))
+       (char= (char line 1) #\Space)))
 
 (defun player-line-p (line)
   (and (>= (length line) 2)
