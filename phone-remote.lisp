@@ -125,7 +125,7 @@
 (defmethod hunchensocket:text-message-received ((server ws-server) client message)
   (handle-message message))  
 
-(defvar *ws-server* nil)
+(defvar *ws-server* (make-instance 'ws-server :path "/"))
 
 (defun find-ws-server (request)
   (when (string= (hunchentoot:script-name request) (path *ws-server*))
@@ -142,7 +142,6 @@
   (with-open-file (f "keymaps.txt")
     (setf *keymaps* (read-keymaps f)))
   (format t "~&Reading keymaps complete.~%")
-  (setf *ws-server* (make-instance 'ws-server :path "/"))
   (let* ((web-server (start-server))
 	 (ws-server (start-ws-server))
 	 (target-url (create-target-url (read-host-address "address.txt")
