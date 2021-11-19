@@ -117,10 +117,10 @@
   (:default-initargs :client-class 'ws-client))
 
 (defmethod hunchensocket:client-connected ((server ws-server) client)
-  (format t "~&Client connected to websocket server.")
+  (format t "~&Client connected to websocket server.~%")
   (force-output))
 (defmethod hunchensocket:client-disconnected ((server ws-server) client)
-  (format t "~&Client disconnected from websocket server.")
+  (format t "~&Client disconnected from websocket server.~%")
   (force-output))
 (defmethod hunchensocket:text-message-received ((server ws-server) client message)
   (handle-message message))  
