@@ -60,14 +60,6 @@
   (cl-qrencode:encode-png url))
 
 ;;; Keymap interpreter
-(defun strip-spaces (string)
-  (flet ((spacep (char) (char= char #\Space)))
-    (let ((start (position-if (complement #'spacep) string)))
-      (if start
-	  (let ((end (position-if (complement #'spacep) string :from-end t)))
-	    (subseq string start (1+ end)))
-	  ""))))
-
 (defun key-line-p (line)
   (and (= (length line) 3)
        (char= (char line 1) #\Space)))
@@ -97,7 +89,7 @@
 		   (t (format t "~&Discarding invalid line: ~A~%" line)))))
       (loop as line = (read-line stream nil nil)
 	    while line
-	    do (process-line (string-upcase (strip-spaces line))))
+	    do (process-line (string-upcase (string-trim " " line))))
       keymaps)))
 
 ;;; Websocket message handler
