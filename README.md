@@ -5,6 +5,7 @@ A program to allow a smartphone to be used as a PC input device.
 When the program is launched a web server is created. 
 A URL is generated for phones(or other machines) on the local network to connect to the server. 
 When the webpage is opened a WebSocket connection is established between the phone and the host.
+
 The user tapping on the buttons will send messages over the WebSocket connection to the server.
 The server will translate the received message into the corresponding SendInput (Windows API) call.
 Windows will send a KeyEvent to the focused window.
